@@ -233,5 +233,5 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     button = buttons.build_menu(8)
     msg += f"\n<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
     msg += f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UP:</b> {get_readable_time(time() - botStartTime)}"
-    msg += f"\n<b>DL-Speed:</b> {get_readable_file_size(0)}/s | <b>UP-Speed:</b> {get_readable_file_size(0)}/s"
+    msg += f"\n<b>DL-Speed:</b> {get_readable_file_size(task.download_speed())}/s | <b>UP-Speed:</b> {get_readable_file_size(task.upload_speed())}/s"
     return msg, button
