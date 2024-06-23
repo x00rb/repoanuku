@@ -43,6 +43,7 @@ async def mirror_status(_, message):
         msg += (
             f"\n\n<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {free}"
             f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UP:</b> {currentTime}"
+            f"\n\n<b>DL-Speed:</b> {get_readable_file_size(dl_speed)}/s | <b>UP-Speed:</b> {get_readable_file_size(up_speed)}/s"
         )
         reply_message = await sendMessage(message, msg, photo=True)
         await auto_delete_message(message, reply_message)
