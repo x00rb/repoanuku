@@ -153,9 +153,6 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         
     tasks = await sync_to_async(getSpecificTasks, status, sid if is_user else None)
 
-    dl_speed = 0
-    up_speed = 0
-
     STATUS_LIMIT = config_dict["STATUS_LIMIT"]
     tasks_no = len(tasks)
     pages = (max(tasks_no, 1) + STATUS_LIMIT - 1) // STATUS_LIMIT
@@ -207,7 +204,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             msg += f" | <b>Time: </b>{task.seeding_time()}"
         else:
             msg += f"\n<b>Size: </b>{task.size()}"
-        msg += f"\n<b>Stop: </b><a href='/{BotCommands.CancelTaskCommand[1]} {task.gid()}'>{BotCommands.CancelTaskCommand[1]} {task.gid()}</a>\n\n"
+        msg += f"\n<b>Stop: </b><code>/{BotCommands.CancelTaskCommand[1]} {task.gid()}</code>\n\n"
 
     if len(msg) == 0:
         if status == "All":
