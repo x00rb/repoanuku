@@ -36,10 +36,12 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 async def mirror_status(_, message):
     async with task_dict_lock:
         count = len(task_dict)
+        dl_speed = 0
+        up_speed = 0
     if count == 0:
         currentTime = get_readable_time(time() - botStartTime)
         free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
-        msg = f"No Active Tasks!\nEach user can get status for his tasks by adding me or user_id after cmd: /{BotCommands.StatusCommand} me"
+        msg = f"No Active Tasks!\nEachsss user can get status for his tasks by adding me or user_id after cmd: /{BotCommands.StatusCommand} me"
         msg += (
             f"\n\n<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {free}"
             f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UP:</b> {currentTime}"
