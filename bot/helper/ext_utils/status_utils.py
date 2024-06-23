@@ -153,6 +153,9 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         
     tasks = await sync_to_async(getSpecificTasks, status, sid if is_user else None)
 
+    dl_speed = 0
+    up_speed = 0
+
     STATUS_LIMIT = config_dict["STATUS_LIMIT"]
     tasks_no = len(tasks)
     pages = (max(tasks_no, 1) + STATUS_LIMIT - 1) // STATUS_LIMIT
@@ -233,4 +236,5 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
     button = buttons.build_menu(8)
     msg += f"\n<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
     msg += f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UP:</b> {get_readable_time(time() - botStartTime)}"
+    msg += f"\n<b>DL-Speed:</b> {get_readable_file_size(dl_speed)}/s | <b>UP-Speed:</b> {get_readable_file_size(up_speed)}/s"
     return msg, button
