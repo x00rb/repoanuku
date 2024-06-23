@@ -155,6 +155,42 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
 
     dl_speed = 0
     up_speed = 0
+    seed_speed = 0
+    async with task_dict_lock:
+        for download in task_dict.values():
+            match await sync_to_async(download.status):
+                case MirrorStatus.STATUS_DOWNLOADING:
+                    tasks["Download"] += 1
+                    dl_speed += speed_string_to_bytes(download.speed())
+                case MirrorStatus.STATUS_UPLOADING:
+                    tasks["Upload"] += 1
+                    up_speed += speed_string_to_bytes(download.speed())
+                case MirrorStatus.STATUS_SEEDING:
+                    tasks["Seed"] += 1
+                    seed_speed += speed_string_to_bytes(download.seed_speed())
+                case MirrorStatus.STATUS_ARCHIVING:
+                    tasks["Archive"] += 1
+                case MirrorStatus.STATUS_EXTRACTING:
+                    tasks["Extract"] += 1
+                case MirrorStatus.STATUS_SPLITTING:
+                    tasks["Split"] += 1
+                case MirrorStatus.STATUS_QUEUEDL:
+                    tasks["QueueDl"] += 1
+                case MirrorStatus.STATUS_QUEUEUP:
+                    tasks["QueueUp"] += 1
+                case MirrorStatus.STATUS_CLONING:
+                    tasks["Clone"] += 1
+                case MirrorStatus.STATUS_CHECKING:
+                    tasks["CheckUp"] += 1
+                case MirrorStatus.STATUS_PAUSED:
+                    tasks["Pause"] += 1
+                case MirrorStatus.STATUS_SAMVID:
+                    tasks["SamVid"] += 1
+                case MirrorStatus.STATUS_CONVERTING:
+                    tasks["ConvertMedia"] += 1
+                case _:
+                    tasks["Download"] += 1
+                    dl_speed += speed_string_to_bytes(download.speed())
 
     STATUS_LIMIT = config_dict["STATUS_LIMIT"]
     tasks_no = len(tasks)
