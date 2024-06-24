@@ -2,7 +2,6 @@ import string
 import random
 import time
 import re
-import requests
 
 from cloudscraper import create_scraper
 from hashlib import sha256
@@ -1303,83 +1302,31 @@ def send_cm(url):
 
 
 def doods(url):
-    def extract_file_code(url):
-        match = re.search(r'.*/(.*)', url.rstrip('/'))
-        return match.group(1) if match else None
-
-    def generate_random_string(length=10):
-        characters = string.ascii_letters + string.digits
-        return ''.join(random.choice(characters) for _ in range(length))
-
-    session = requests.Session()
-    session.headers.update({
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "Accept-Encoding": "gzip, deflate, br, zstd",
-        "Referer": "https://d000d.com/",
-        "User-Agent": "Mozilla/5.0 (Linux; Android 10; Pixel 4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36",
-    })
-
-    file_code = extract_file_code(url)
-    if not file_code:
-        raise DirectDownloadLinkException("Error: Can't find the file code in the URL.")
-
-    doodstream_url = f"https://d000d.com/e/{file_code}"
-
-    response = session.get(doodstream_url)
-    if response.status_code == 200:
-
-        match = re.search(r"\$.get\('([^']+)',\s*function\(data\)", response.text)
-        if match:
-            url_inside_get = match.group(1)
-
-            last_value = re.search(r"/([^/]+)$", url_inside_get).group(1)
-            url = f"https://d000d.com{url_inside_get}"
-
-            response = session.get(url)
-            if response.ok:
-
-                part_1 = response.text
-                random_string = generate_random_string()
-                token = last_value
-                expiry = int(time.time() * 1000)
-                part_2 = f"{random_string}?token={token}&expiry={expiry}"
-                final_url = f"{part_1}{part_2}"
-
-                return final_url
-            else:
-                raise DirectDownloadLinkException("Error: Unable to fetch the contents of the secondary URL.")
-        else:
-            raise DirectDownloadLinkException("Error: Unable to find the required URL inside the initial response.")
-    else:
-        raise DirectDownloadLinkException(f"Error: Unable to fetch the Doodstream page. HTTP status code: {response.status_code}")
-
-
-# def doods(url):
-#     if "/e/" in url:
-#         url = url.replace("/e/", "/d/")
-#     parsed_url = urlparse(url)
-#     with create_scraper() as session:
-#         try:
-#             html = HTML(session.get(url).text)
-#         except Exception as e:
-#             raise DirectDownloadLinkException(
-#                 f"ERROR: {e.__class__.__name__} While fetching token link"
-#             ) from e
-#         if not (link := html.xpath("//div[@class='download-content']//a/@href")):
-#             raise DirectDownloadLinkException(
-#                 "ERROR: Token Link not found or maybe not allow to download! open in browser."
-#             )
-#         link = f"{parsed_url.scheme}://{parsed_url.hostname}{link[0]}"
-#         sleep(2)
-#         try:
-#             _res = session.get(link)
-#         except Exception as e:
-#             raise DirectDownloadLinkException(
-#                 f"ERROR: {e.__class__.__name__} While fetching download link"
-#             ) from e
-#     if not (link := search(r"window\.open\('(\S+)'", _res.text)):
-#         raise DirectDownloadLinkException("ERROR: Download link not found try again")
-#     return (link.group(1), f"Referer: {parsed_url.scheme}://{parsed_url.hostname}/")
+    if "/e/" in url:
+        url = url.replace("/e/", "/d/")
+    parsed_url = urlparse(url)
+    with create_scraper() as session:
+        try:
+            html = HTML(session.get(url).text)
+        except Exception as e:
+            raise DirectDownloadLinkException(
+                f"ERROR: {e.__class__.__name__} While fetching token link"
+            ) from e
+        if not (link := html.xpath("//div[@class='download-content']//a/@href")):
+            raise DirectDownloadLinkException(
+                "ERROR: Token Link not found or maybe not allow to download! open in browser."
+            )
+        link = f"{parsed_url.scheme}://{parsed_url.hostname}{link[0]}"
+        sleep(2)
+        try:
+            _res = session.get(link)
+        except Exception as e:
+            raise DirectDownloadLinkException(
+                f"ERROR: {e.__class__.__name__} While fetching download link"
+            ) from e
+    if not (link := search(r"window\.open\('(\S+)'", _res.text)):
+        raise DirectDownloadLinkException("ERROR: Download link not found try again")
+    return (link.group(1), f"Referer: {parsed_url.scheme}://{parsed_url.hostname}/")
 
 
 def easyupload(url):
